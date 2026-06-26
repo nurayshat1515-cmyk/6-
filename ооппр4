@@ -1,0 +1,149 @@
+class Hunter:
+    def __init__(self, name):
+        self.__name = name
+        self.__hp = 100
+        self.__weapons = []  
+
+    def get_name(self):
+        return self.__name
+    
+    def get_hp(self):
+        return self.__hp
+ 
+    def set_hp(self, value):
+        if value < 0:
+            self.__hp = 0
+        else:
+            self.__hp = value
+    
+
+    def add_weapon(self, weapon):
+        self.__weapons.append(weapon)
+        print(f"🔧 {self.__name} добавил в инвентарь: {weapon.name}")
+    
+    def show_inventory(self):
+        if not self.__weapons:
+            print(f"📭 Инвентарь {self.__name} пуст.")
+            return
+        
+        print(f"\n🎒 Инвентарь охотника {self.__name}:")
+        print("-" * 40)
+        for i, weapon in enumerate(self.__weapons, start=1):
+            # Получаем урон через атрибут damage (если есть)
+            damage = getattr(weapon, 'damage', '?')
+            print(f"  {i}. {weapon.name} (урон: {damage})")
+        print("-" * 40)
+    
+    def attack(self, weapon_index, monster):
+       
+        if not self.is_alive():
+            print(f"💀 {self.__name} мёртв и не может атаковать!")
+            return
+        
+        if weapon_index < 1 or weapon_index > len(self.__weapons):
+            print(f"❌ Неверный индекс оружия! Доступно: 1-{len(self.__weapons)}")
+            return
+        
+        weapon = self.__weapons[weapon_index - 1]
+        print(f"\n⚔️  {self.__name} атакует {monster.name}!")
+        weapon.use(monster)
+        
+        if not monster.is_alive():
+            print(f"🏆 {self.__name} победил {monster.name}!")
+    
+
+    def is_alive(self):
+        return self.__hp > 0
+
+class Zombie:
+    def __init__(self, name):
+        self.name = name
+        self.hp = 80 
+    
+    def take_damage(self, damage):
+        self.hp -= damage
+        print(f"   {self.name} получает {damage} урона! ❤️ Осталось HP: {max(0, self.hp)}")
+        if self.hp <= 0:
+            print(f"   💀 {self.name} повержен!")
+    
+    def is_alive(self):
+        return self.hp > 0
+
+
+class Weapon:
+    def __init__(self, name):
+        self.name = name
+    
+    def use(self, monster):
+        pass
+
+
+class SilverSword(Weapon):
+    def __init__(self):
+        super().__init__("Серебряный меч")
+        self.damage = 30
+    
+    def use(self, monster):
+        print(f"   🗡️  Удар {self.name}! (урон: {self.damage})")
+        monster.take_damage(self.damage)
+
+
+class HolyWater(Weapon):
+    def __init__(self):
+        super().__init__("Святая вода")
+        self.damage = 20
+    
+    def use(self, monster):
+        print(f"   💧 Кропление {self.name}! (урон: {self.damage})")
+        monster.take_damage(self.damage)
+
+
+class CrossbowBolt(Weapon):
+    def __init__(self):
+        super().__init__("Арбалет с болтом")
+        self.damage = 25
+    
+    def use(self, monster):
+        print(f"   🏹 Выстрел из {self.name}! (урон: {self.damage})")
+        monster.take_damage(self.damage)
+
+
+print("=== ЭТАП 4 - Класс Охотника ===\n")
+
+hunter = Hunter("Ван Хельсинг")
+print(f"👤 Создан охотник: {hunter.get_name()}, HP: {hunter.get_hp()}")
+
+sword = SilverSword()
+water = HolyWater()
+crossbow = CrossbowBolt()
+
+hunter.add_weapon(sword)
+hunter.add_weapon(water)
+hunter.add_weapon(crossbow)
+
+hunter.show_inventory()
+
+zombie = Zombie("Зомби-гигант")
+print(f"\n👾 Появляется {zombie.name} с HP: {zombie.hp}")
+
+
+hunter.attack(1, zombie)  # Серебряный меч
+hunter.attack(2, zombie)  # Святая вода
+hunter.attack(3, zombie)  # Арбалет
+
+# Проверка защиты сеттера
+print(f"\n🧪 Тест сеттера:")
+print(f"Текущий HP: {hunter.get_hp()}")
+hunter.set_hp(-50)  # Пытаемся уйти в минус
+print(f"HP после set_hp(-50): {hunter.get_hp()} (защита сработала!)")
+hunter.set_hp(150)
+print(f"HP после set_hp(150): {hunter.get_hp()}")
+
+print(f"\nЖив ли охотник? {hunter.is_alive()}")
+
+
+print(f"\n🔒 Проверка приватности:")
+print(f"Имя охотника (через геттер): {hunter.get_name()}")
+try:
+    print(f"Прямой доступ к __name: {hunter.__name}")  
+    print(f"❌ Ошибка доступа к приватному атрибуту: {e}")
