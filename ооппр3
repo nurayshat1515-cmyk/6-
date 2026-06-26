@@ -1,0 +1,65 @@
+class Weapon:
+    def __init__(self, name):
+        self.name = name
+    
+    def use(self, monster):
+        """Base method to be overridden by child classes"""
+        pass
+
+
+class SilverSword(Weapon):
+    def __init__(self):
+        super().__init__("Серебряный меч")
+        self.damage = 30
+    
+    def use(self, monster):
+        print(f"🗡️  Охотник наносит удар {self.name}! (урон: {self.damage})")
+        monster.take_damage(self.damage)
+
+
+class HolyWater(Weapon):
+    def __init__(self):
+        super().__init__("Святая вода")
+        self.damage = 20
+    
+    def use(self, monster):
+        print(f"💧 Охотник кропит {self.name} на монстра! (урон: {self.damage})")
+        monster.take_damage(self.damage)
+
+
+class CrossbowBolt(Weapon):
+    def __init__(self):
+        super().__init__("Арбалет с болтом")
+        self.damage = 25
+    
+    def use(self, monster):
+        print(f"🏹 Охотник стреляет из {self.name}! (урон: {self.damage})")
+        monster.take_damage(self.damage)
+
+
+# Example Monster class for testing
+class Zombie:
+    def __init__(self, name):
+        self.name = name
+        self.hp = 100
+    
+    def take_damage(self, damage):
+        self.hp -= damage
+        print(f"   {self.name} получает {damage} урона! ❤️ Осталось HP: {self.hp}")
+        if self.hp <= 0:
+            print(f"   💀 {self.name} повержен!")
+
+
+# Testing polymorphism
+print("=== ЭТАП 3 - Полиморфизм: Арсенал охотника ===\n")
+
+weapons = [SilverSword(), HolyWater(), CrossbowBolt()]
+zombie = Zombie("Зомби")
+
+print(f"👾 Появляется {zombie.name} с HP: {zombie.hp}\n")
+
+for w in weapons:
+    w.use(zombie)
+    print()
+
+print("✨ Полиморфизм в действии: один цикл — три разных удара!")
