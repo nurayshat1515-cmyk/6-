@@ -1,0 +1,116 @@
+import random
+
+# === ОРУЖИЕ ===
+class Weapon:
+    def __init__(self, name, damage):
+        self.name = name
+        self.damage = damage
+    
+    def use(self, monster):
+        print(f"   {self.name} наносит {self.damage} урона!")
+        monster.take_damage(self.damage)
+
+# === МОНСТРЫ ===
+class Monster:
+    def __init__(self, name, hp):
+        self.name = name
+        self.hp = hp
+    
+    def take_damage(self, damage):
+        self.hp = max(0, self.hp - damage)
+        print(f"   {self.name} HP: {self.hp}")
+    
+    def is_alive(self):
+        return self.hp > 0
+    
+    def attack(self, hunter):
+        damage = random.randint(5, 15)
+        hunter.take_damage(damage)
+        print(f"   {self.name} атакует! -{damage} HP")
+
+class Zombie(Monster):
+    def __init__(self):
+        super().__init__("Зомби", 80)
+
+class Vampire(Monster):
+    def __init__(self):
+        super().__init__("Вампир", 60)
+    
+    def attack(self, hunter):
+        damage = random.randint(10, 18)
+        hunter.take_damage(damage)
+        self.hp = min(60, self.hp + damage//2)
+        print(f"   Вампир атакует! -{damage} HP, +{damage//2} HP себе")
+
+class Ghost(Monster):
+    def __init__(self):
+        super().__init__("Призрак", 50)
+    
+    def take_damage(self, damage):
+        if random.random() < 0.3:
+            print("   Призрак уклонился!")
+            return
+        super().take_damage(damage)
+
+class Werewolf(Monster):
+    def __init__(self):
+        super().__init__("Оборотень", 100)
+
+# === ОХОТНИК ===
+class Hunter:
+    def __init__(self, name):
+        self.__name = name
+        self.__hp = 100
+        self.__weapons = []
+    
+    def get_name(self):
+        return self.__name
+    
+    def get_hp(self):
+        return self.__hp
+    
+    def take_damage(self, damage):
+        self.__hp = max(0, self.__hp - damage)
+    
+    def is_alive(self):
+        return self.__hp > 0
+    
+    def add_weapon(self, weapon):
+        self.__weapons.append(weapon)
+    
+    def attack(self, idx, monster):
+        if idx < len(self.__weapons):
+            self.__weapons[idx].use(monster)
+
+# === СОЗДАЁМ ОБЪЕКТЫ ===
+hunter = Hunter("Ван Хельсинг")
+hunter.add_weapon(Weapon("Серебряный меч", 30))
+hunter.add_weapon(Weapon("Святая вода", 20))
+hunter.add_weapon(Weapon("Арбалет", 25))
+
+monsters = [Zombie(), Vampire(), Ghost(), Werewolf()]
+
+# === ИГРОВОЙ ЦИКЛ ===
+print("⚔️ ФИНАЛЬНЫЙ БОЙ!\n")
+weapon_idx = 0
+
+for monster in monsters:
+    print(f"\nБОЙ С {monster.name}!")
+    
+    while monster.is_alive() and hunter.is_alive():
+        hunter.attack(weapon_idx % 3, monster)
+        weapon_idx += 1
+        
+        if monster.is_alive():
+            monster.attack(hunter)
+        
+        print(f"   ❤️ Охотник: {hunter.get_hp()} HP | {monster.name}: {monster.hp} HP")
+    
+    if not hunter.is_alive():
+        print("\n💀 Охотник погиб!")
+        break
+
+if hunter.is_alive():
+    print("\n🎉 ПОБЕДА! Все монстры уничтожены!")
+else:
+    print("\n😢 ПОРАЖЕНИЕ...")
