@@ -1,0 +1,66 @@
+import random
+
+class Monster:
+    def __init__(self, name, hp, dmg):
+        self.__name, self.__hp, self.__dmg = name, hp, dmg
+
+    def get_name(self): return self.__name
+    def get_hp(self): return self.__hp
+    def get_dmg(self): return self.__dmg
+
+    def set_hp(self, value):
+        self.__hp = max(0, value)
+
+    def is_alive(self): return self.__hp > 0
+    def show_status(self): print(f"[{self.__name}] HP: {self.__hp}")
+
+    def take_damage(self, damage):
+        self.set_hp(self.__hp - damage)
+        print(f"{self.__name} получил {damage} урона. HP: {self.__hp}")
+
+    def attack_hunter(self, hunter):
+        hunter.set_hp(hunter.get_hp() - self.__dmg)
+        print(f"{self.__name} атакует охотника! Урон: {self.__dmg}")
+
+
+class Zombie(Monster):
+    def __init__(self, name): super().__init__(name, 120, 10)
+    def take_damage(self, damage):
+        self.set_hp(self.get_hp() - damage)
+        print(f"Зомби {self.get_name()} теряет конечность! Получено: {damage}. HP: {self.get_hp()}")
+
+
+class Vampire(Monster):
+    def __init__(self, name): super().__init__(name, 80, 15)
+    def take_damage(self, damage):
+        actual = max(0, damage - 5)
+        self.set_hp(self.get_hp() - actual)
+        print(f"{self.get_name()} поглощает 5 урона! Получено: {actual}. HP: {self.get_hp()}")
+
+
+class Ghost(Monster):
+    def __init__(self, name): super().__init__(name, 60, 20)
+    def take_damage(self, damage):
+        if random.random() < 0.3:
+            print(f"Призрак {self.get_name()} уклонился! Получено: 0. HP: {self.get_hp()}")
+            return
+        self.set_hp(self.get_hp() - damage)
+        print(f"Призрак {self.get_name()} получил {damage} урона. HP: {self.get_hp()}")
+
+
+class Werewolf(Monster):
+    def __init__(self, name): super().__init__(name, 100, 25)
+    def take_damage(self, damage):
+        prev = self.get_hp()
+        self.set_hp(prev - damage)
+        print(f"Оборотень {self.get_name()} получил {damage} урона. HP: {self.get_hp()}")
+        if self.get_hp() < 50 <= prev:
+            print("!!! ОБОРОТЕНЬ ТРАНСФОРМИРУЕТСЯ В ЗВЕРЯ !!!")
+
+
+# Проверка
+v = Vampire("Дракула")
+v.take_damage(30)
+
+z = Zombie("Зомби")
+z.take_damage(30)
